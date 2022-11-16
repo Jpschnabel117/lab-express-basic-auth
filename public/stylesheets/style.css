@@ -22,3 +22,8 @@ a {
   border-radius: 5px;
   border-color: #00b7ff;
 }
+
+nav {
+  display: flex;
+  justify-content: space-between;
+}
