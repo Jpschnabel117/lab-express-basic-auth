@@ -3,14 +3,16 @@ const router = new Router();
 const bcryptjs = require("bcryptjs");
 const User = require("../models/User.model");
 const { default: mongoose } = require("mongoose");
+const middlewares = require("../middlewares/auth.middlewares");
 const saltRounds = 10;
 
-router.get("/signup", (req, res, next) => {
+router.get("/signup", middlewares.isAnon, (req, res, next) => {
+  req.session.myfavoritecolor = "green";
   res.render("auth/signup");
 });
 
 //creating new user route
-router.post("/signup", (req, res, next) => {
+router.post("/signup", middlewares.isAnon, (req, res, next) => {
   if (!req.body.username || !req.body.password) {
     res.render("auth/signup", {
       errorMessage:
@@ -60,18 +62,19 @@ router.post("/signup", (req, res, next) => {
 });
 
 //renders userprofile
-router.get("/userProfile", (req, res) => {
-  console.log(req.session);
-  res.render("users/user-profile", { userInSession: req.session.currentUser });
+router.get("/userProfile", middlewares.isLoggedIn, (req, res) => {
+  res.render("users/user-profile", {
+    userInSession: req.session.currentUser,
+  });
 });
 
 //renders signin
-router.get("/signin", (req, res, next) => {
+router.get("/signin", middlewares.isAnon, (req, res, next) => {
   res.render("auth/signin");
 });
 
 //sign in, pw checks, redirects to userprofile if correct
-router.post("/signin", (req, res, next) => {
+router.post("/signin", middlewares.isAnon, (req, res, next) => {
   if (!req.body.username || !req.body.password) {
     res.render("auth/signin", {
       errorMessage:
@@ -106,6 +109,14 @@ router.post("/signin", (req, res, next) => {
       }
     })
     .catch((err) => next(err));
+});
+
+router.get("/main", middlewares.isLoggedIn, (req, res, next) => {
+  res.render("main");
+});
+
+router.get("/private", middlewares.isLoggedIn, (req, res, next) => {
+  res.render("private");
 });
 
 router.post("/logout", (req, res, next) => {

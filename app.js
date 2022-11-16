@@ -28,6 +28,11 @@ const capitalized = (string) =>
 
 app.locals.title = `${capitalized(projectName)}- Generated with Ironlauncher`;
 
+app.use((req,res,next) => {
+  //console.log('hi')
+  next()
+})
+
 app.use(
   session({
     secret: "keyboardcat",
