@@ -27,11 +27,9 @@ router.post("/signup", (req, res, next) => {
     });
     return;
   }
-  //not showing error, error is working, but not visible
-
   console.log(req.body);
   User.findOne({ username: req.body.username })
-    .then((founduser) => {
+    .then(() => {
       return bcryptjs.genSalt(saltRounds);
     })
     .then((salt) => {
@@ -62,7 +60,10 @@ router.post("/signup", (req, res, next) => {
 });
 
 //renders userprofile
-router.get("/userProfile", (req, res) => res.render("users/user-profile"));
+router.get("/userProfile", (req, res) => {
+  console.log(req.session);
+  res.render("users/user-profile", { userInSession: req.session.currentUser });
+});
 
 //renders signin
 router.get("/signin", (req, res, next) => {
@@ -81,43 +82,28 @@ router.post("/signin", (req, res, next) => {
 
   console.log(req.body);
   let userPwCheck = "";
+  //hash inputed password check
   User.findOne({ username: req.body.username })
     .then((founduser) => {
+      console.log("tryed PW: ", req.body.username);
+      console.log("actual PW: ", userPwCheck);
       if (!founduser) {
-        res.send(
-          "that username does not exist, try again or create an account"
-        );
+        res.render("auth/signin", {
+          errorMessage: "that username does not exist",
+        });
+        return;
+      } else if (bcryptjs.compareSync(req.body.password, founduser.password)) {
+        console.log("correct PW");
+        //res.render("/userProfile", { user: req.body.user });
+        req.session.currentUser = founduser;
+        req.session.hi = "hello";
+        res.redirect("/userProfile");
+      } else {
+        res.status(500).render("auth/signin", {
+          errorMessage: "incorrect password",
+        });
         return;
       }
-      userPwCheck = founduser.password;
-      return bcryptjs.genSalt(saltRounds);
-    })
-    .then((salt) => {
-      return bcryptjs.hash(req.body.password, salt);
-    })
-    .then((hashedPassword) => {
-      console.log("tryed PW: ", hashedPassword);
-      console.log("actual PW: ", userPwCheck);
-      console.log(
-        "compare result: ",
-        bcryptjs.compareSync(hashedPassword, userPwCheck)
-      );
-      //not correct password check result
-      bcryptjs.compare(hashedPassword, userPwCheck).then((validPW) => {
-        console.log(validPW);
-        if (validPW) {
-          console.log("correct PW");
-          //res.render("/userProfile", { user: req.body.user });
-
-          req.session.currentUser = '';
-          res.redirect("/userProfile");
-        } else {
-          res.status(500).render("auth/signin", {
-            errorMessage: "incorrect password",
-          });
-          return;
-        }
-      });
     })
     .catch((err) => next(err));
 });
