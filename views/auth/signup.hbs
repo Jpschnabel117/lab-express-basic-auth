@@ -1,0 +1,23 @@
+<div>
+  <h2>Signup</h2>
+  <form action="/signup" method="POST">
+    <div>
+      <label>Username
+        <input type="text" name="username" placeholder="ironhacker" />
+      </label>
+    </div>
+    <div>
+      <label>
+        Password
+        <input type="password" name="password" placeholder="********" />
+      </label>
+    </div>
+    <br />
+    <button class="submitbuttons" type="submit">Create account</button>
+  </form>
+  <div class="validationErrors">
+    {{#if errorMessage}}
+      <p class="error">{{errorMessage}}</p>
+    {{/if}}
+  </div>
+</div>

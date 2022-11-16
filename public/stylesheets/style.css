@@ -4,5 +4,21 @@ body {
 }
 
 a {
-  color: #00B7FF;
+  color: #00b7ff;
+}
+
+.validationErrors {
+  background-color: crimson;
+  width: 300px;
+  padding: 5px;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+}
+
+.submitbuttons {
+  width: 310px;
+  background-color: #00b7ff;
+  border-radius: 5px;
+  border-color: #00b7ff;
 }
